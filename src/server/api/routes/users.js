@@ -2,12 +2,14 @@ const express = require('express');
 const UserModel = require('../../models/users');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
-const { checkToken, checkAdMinRole } = require('../middleware/auth');
+const userCtrl = require('../middleware/auth');
+const { getUsers, getUserById, createUsers } = require('../../services/user.service');
 const saltRounds = 10;
 
 const app = express();
 
-app.get('/users', checkToken, (req, res) => {
+/* checkToken */
+app.get('/users', (req, res) => {
 
     // route /users?limit=<value>&start=<value>
     console.log(` get All Users `);
@@ -41,7 +43,8 @@ app.get('/users', checkToken, (req, res) => {
 
 });
 
-app.get('/users/:id', checkToken, (req, res) => {
+/* checkToken, */
+app.get('/users/:id', (req, res) => {
     let userId = req.params.id;
     let body = req.body;
     console.log(`get user with id ${userId}`);
@@ -63,7 +66,7 @@ app.get('/users/:id', checkToken, (req, res) => {
 
 });
 /* [checkToken, checkAdMinRole] */
-app.post('/users', (req, res) => {
+/* app.post('/users', (req, res) => {
     let body = req.body;
     console.log(` POST Create Users `);
     console.log('***** Body data *****', req.body);
@@ -92,9 +95,11 @@ app.post('/users', (req, res) => {
         });
     });
 
-});
+}); */
+app.post('/users', userCtrl.createUsers);
 
-app.put('/users/password', checkToken, (req, res) => {
+/* checkToken */
+app.put('/users/password', (req, res) => {
     let body = req.body;
     let userId = body.id;
     let cleanBody = _.pick(body, ['password']);
@@ -117,7 +122,8 @@ app.put('/users/password', checkToken, (req, res) => {
 
 });
 
-app.put('/users/:id', [checkToken, checkAdMinRole], (req, res) => {
+/* [checkToken, checkAdMinRole], */
+app.put('/users/:id', (req, res) => {
     console.log(` Update user By ID Users `);
     console.log(`Los params son `, req.params);
     let id = req.params.id;
@@ -143,7 +149,8 @@ app.put('/users/:id', [checkToken, checkAdMinRole], (req, res) => {
 });
 
 /* hard delete */
-app.delete('/users/:id', [checkToken, checkAdMinRole], (req, res) => {
+/* [checkToken, checkAdMinRole], */
+app.delete('/users/:id', (req, res) => {
     console.log(` Delete Users - hard delete `);
     let idUser = req.params.id;
 
@@ -173,7 +180,8 @@ app.delete('/users/:id', [checkToken, checkAdMinRole], (req, res) => {
 });
 
 /* soft delete */
-app.delete('/users/2/:id', checkToken, (req, res) => {
+/* checkToken */
+app.delete('/users/2/:id', (req, res) => {
     console.log(` delete User - soft delete `);
     let idUser = req.params.id;
     req.body.state = false;
