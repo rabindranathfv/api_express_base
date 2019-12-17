@@ -20,7 +20,7 @@ process.env.SEED = process.env.SEED || 'token-seed-prod';
 let urlDB;
 
 if (process.env.NODE_ENV === 'dev') {
-    urlDB = 'mongodb://localhost:27017/coffe';
+    urlDB = 'mongodb://localhost:27017/innovaDB';
 } else {
     urlDB = process.env.MONGO_URI;
 }

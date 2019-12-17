@@ -62,8 +62,8 @@ app.get('/users/:id', checkToken, (req, res) => {
         });
 
 });
-
-app.post('/users', [checkToken, checkAdMinRole], (req, res) => {
+/* [checkToken, checkAdMinRole] */
+app.post('/users', (req, res) => {
     let body = req.body;
     console.log(` POST Create Users `);
     console.log('***** Body data *****', req.body);
