@@ -2,7 +2,7 @@ const express = require('express');
 const UserModel = require('../../models/users');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
-const userCtrl = require('../middleware/auth');
+const userCtrl = require('../../controllers/user.ctrl');
 const { getUsers, getUserById, createUsers } = require('../../services/user.service');
 const saltRounds = 10;
 
@@ -96,7 +96,8 @@ app.get('/users/:id', (req, res) => {
     });
 
 }); */
-app.post('/users', userCtrl.createUsers);
+app.post('/users', userCtrl.postCreateUser);
+
 
 /* checkToken */
 app.put('/users/password', (req, res) => {

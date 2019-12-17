@@ -3,7 +3,7 @@
 const bcrypt = require('bcrypt');
 
 const hashPassword = (password, saltRounds) => {
-    bcrypt.hashSync(password, saltRounds)
+    return bcrypt.hashSync(password, saltRounds)
 };
 
 const checkPassword = (bodyPass, userPass) => {
