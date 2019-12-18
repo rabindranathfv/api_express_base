@@ -23,7 +23,8 @@ const handleFatalError = (error) => {
 * 2) object: The object of database. Default null
     model: string of model. Example ('User'),
     data: object of database
-* 3) status: The status of response. Default status 200 OK
+* 3) status: The status of response. Default status 200 OK+
+* 4) in error from backend we send message as string
 */
 const handleResponseSuccess = (res, object = { data: null, model: null }, status = 200) => {
     console.log(chalk `{green.bold The response has be send successfully! :) }`)
@@ -42,15 +43,15 @@ const handleResponseSuccess = (res, object = { data: null, model: null }, status
 }
 
 /* Function to send a error in the response */
-const handleResponseError = (res, message, error = {}, code) => {
+const handleResponseError = (res, message, error = {}, status) => {
     console.error(chalk `{red.bold WTF!! ${message} O__O }`);
     // console.log(error);
-    
+
     // if (error.stack) { console.error(error.stack) }
 
     res.status(code || 500).send({
         ok: false,
-        status: code || 500,
+        status: status || 500,
         message: `${message}, An error ocurred  ❌`,
         error: error.message
     });
