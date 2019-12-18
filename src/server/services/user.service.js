@@ -3,7 +3,7 @@
 const Debug = require('debug');
 
 // models
-const userModel = require('../models/users');
+const UserModel = require('../models/users');
 
 // utils
 const utils = require('../utils/utils');
@@ -30,7 +30,7 @@ const createUser = async(objUser) => {
         });
         return user.save();
     } catch (e) {
-        console.log('Error en el servicio', e);
+        // console.log('Error en el servicio', e);
     }
 }
 

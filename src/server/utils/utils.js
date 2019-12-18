@@ -29,8 +29,8 @@ const handleResponseSuccess = (res, object = { data: null, model: null }, status
     console.log(chalk `{green.bold The response has be send successfully! :) }`)
 
     let response = {
-        message: 'Success',
-        status: 1
+        status: 200,
+        ...object
     }
 
     if (object.data === null) {
@@ -44,13 +44,15 @@ const handleResponseSuccess = (res, object = { data: null, model: null }, status
 /* Function to send a error in the response */
 const handleResponseError = (res, message, error = {}, code) => {
     console.error(chalk `{red.bold WTF!! ${message} O__O }`);
-    console.error(error);
+    // console.log(error);
+    
+    // if (error.stack) { console.error(error.stack) }
 
-    if (error.stack) { console.error(error.stack) }
-
-    res.status(error.status || 500).send({
+    res.status(code || 500).send({
+        ok: false,
+        status: code || 500,
         message: `${message}, An error ocurred  ❌`,
-        error
+        error: error.message
     });
 }
 

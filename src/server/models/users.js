@@ -48,6 +48,6 @@ userSchema.methods.toJSON = function() {
 
 
 // use plugin
-userSchema.plugin(uniqueValidator, { message: '{PATH} emil must be unique' });
+userSchema.plugin(uniqueValidator, { message: '{PATH} must be unique' });
 
 module.exports = mongoose.model('user', userSchema);
