@@ -66,36 +66,6 @@ app.get('/users/:id', (req, res) => {
 
 });
 /* [checkToken, checkAdMinRole] */
-/* app.post('/users', (req, res) => {
-    let body = req.body;
-    console.log(` POST Create Users `);
-    console.log('***** Body data *****', req.body);
-
-    let user = new UserModel({
-        name: body.name,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, saltRounds),
-        rol: body.rol
-    });
-
-    console.log('***** User model instance *****', user);
-
-    user.save((err, userDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                message: `problems with users creation, db troubles`,
-                err
-            });
-        }
-        res.json({
-            ok: true,
-            message: 'create users sucessfully',
-            user: userDB
-        });
-    });
-
-}); */
 app.post('/users', userCtrl.postCreateUser);
 
 
