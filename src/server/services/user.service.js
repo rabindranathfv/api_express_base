@@ -1,6 +1,7 @@
 'use strict';
 
 const Debug = require('debug');
+const _ = require('underscore');
 
 // models
 const UserModel = require('../models/users');
@@ -37,7 +38,7 @@ const getUsers = async(req, res, start, limit) => {
 }
 
 const getUserById = async(req, res, ObjectUser, userId) => {
-    UserModel.findByIdAndUpdate(userId, body, { new: true, runValidators: true, useFindAndModify: 'false' })
+    UserModel.findByIdAndUpdate(userId, ObjectUser, { new: true, runValidators: true, useFindAndModify: 'false' })
         .exec((err, userDB) => {
             if (err) {
                 return res.status(400).json({
@@ -83,8 +84,21 @@ const createUser = async(req, res, objUser) => {
     }
 }
 
-const updateUserPassword = async(req, res) => {
+const updateUserPassword = async(req, res, cleanBody, userId) => {
 
+    UserModel.findByIdAndUpdate(userId, cleanBody, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                message: `problem with users updated by Id`,
+                err
+            });
+        }
+        res.json({
+            ok: true,
+            message: 'Update user password sucessfully',
+        });
+    });
 }
 
 const updateUser = async() => {

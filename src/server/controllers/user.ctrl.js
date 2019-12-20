@@ -1,9 +1,14 @@
 'use stric'
 
 const userService = require('../services/user.service');
+const _ = require('underscore');
+
+// utils
+const utils = require('../utils/utils');
 
 const Debug = require('debug');
 const debug = new Debug('backend:controller:user');
+const saltRounds = 10;
 
 const getUsers = async(req, res) => {
     // route /users?limit=<value>&start=<value>
@@ -15,10 +20,10 @@ const getUsers = async(req, res) => {
     const users = await userService.getUsers(req, res, start, limit);
 }
 
-const getUsersById = async(req, res) => {
+const getUserById = async(req, res) => {
     let userId = req.params.id;
     let body = req.body;
-    const user = await userService.getUsersById(req, res, body, userId);
+    const user = await userService.getUserById(req, res, body, userId);
 }
 
 const postCreateUser = async(req, res) => {
@@ -28,7 +33,12 @@ const postCreateUser = async(req, res) => {
 }
 
 const updateUserPassword = async(req, res) => {
+    let body = req.body;
+    let userId = body.id;
+    let cleanBody = _.pick(body, ['password']);
+    cleanBody.password = utils.hashPassword(body.newPassword, saltRounds);
 
+    const userPassword = await userService.updateUserPassword(req, res, cleanBody, userId)
 }
 
 const updateUser = async() => {
@@ -45,7 +55,7 @@ const softDeleteUser = async() => {
 
 module.exports = {
     getUsers,
-    getUsersById,
+    getUserById,
     postCreateUser,
     updateUserPassword,
     updateUser,

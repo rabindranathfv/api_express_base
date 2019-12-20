@@ -12,53 +12,13 @@ const app = express();
 app.get('/users', userCtrl.getUsers);
 
 /* checkToken, */
-app.get('/users/:id', (req, res) => {
-    let userId = req.params.id;
-    let body = req.body;
-    console.log(`get user with id ${userId}`);
-    UserModel.findByIdAndUpdate(userId, body, { new: true, runValidators: true, useFindAndModify: 'false' })
-        .exec((err, userDB) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    message: `the user doesn't exist`,
-                    err
-                });
-            }
-            res.json({
-                ok: true,
-                message: `the user exist`,
-                user: userDB
-            });
-        });
+app.get('/users/:id', userCtrl.getUserById);
 
-});
 /* [checkToken, checkAdMinRole] */
 app.post('/users', userCtrl.postCreateUser);
 
 /* checkToken */
-app.put('/users/password', (req, res) => {
-    let body = req.body;
-    let userId = body.id;
-    let cleanBody = _.pick(body, ['password']);
-    // _.pick grabs and object and return the same object with keys you defined into arrays as second parameter
-    cleanBody.password = bcrypt.hashSync(body.newPassword, saltRounds);
-
-    UserModel.findByIdAndUpdate(userId, cleanBody, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                message: `problem with users updated by Id`,
-                err
-            });
-        }
-        res.json({
-            ok: true,
-            message: 'Update user password sucessfully',
-        });
-    });
-
-});
+app.put('/users/password', userCtrl.updateUserPassword);
 
 /* [checkToken, checkAdMinRole], */
 app.put('/users/:id', (req, res) => {
