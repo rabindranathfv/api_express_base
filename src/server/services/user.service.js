@@ -118,8 +118,30 @@ const updateUser = async(req, res, objUser, UserId) => {
     });
 }
 
-const hardDeleteUser = async() => {
-
+const hardDeleteUser = async(req, res, userId) => {
+    UserModel.findByIdAndRemove(userId, (err, userDelete) => {
+        console.log('*** User ****', userDelete);
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                message: `problems with users hard delete`,
+                err
+            });
+        }
+        if (!userDelete) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'User does not exist'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            message: 'user delete sucessfully',
+            user: userDelete
+        });
+    });
 }
 
 const softDeleteUser = async(req, res, objUser, userId) => {

@@ -50,7 +50,10 @@ const updateUser = async(req, res) => {
 }
 
 const hardDeleteUser = async(req, res) => {
+    console.log(` Delete Users - hard delete `);
+    let idUser = req.params.id;
 
+    const userHardDelete = await userService.hardDeleteUser(req, res, idUser);
 }
 
 const softDeleteUser = async(req, res) => {
