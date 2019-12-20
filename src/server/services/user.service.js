@@ -48,8 +48,28 @@ const createUser = async(objUser, req, res) => {
     }
 }
 
+const updateUserPassword = async(req, res) => {
+
+}
+
+const updateUser = async() => {
+
+}
+
+const hardDeleteUser = async() => {
+
+}
+
+const softDeleteUser = async() => {
+
+}
+
 module.exports = {
     createUser,
     getUserById,
-    getUsers
+    getUsers,
+    updateUserPassword,
+    updateUser,
+    hardDeleteUser,
+    softDeleteUser
 }

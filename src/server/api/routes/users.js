@@ -8,6 +8,8 @@ const saltRounds = 10;
 
 const app = express();
 
+app.get('/users', userCtrl.getUsers);
+
 /* checkToken */
 app.get('/users', (req, res) => {
 
