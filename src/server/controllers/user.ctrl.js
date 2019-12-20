@@ -41,8 +41,12 @@ const updateUserPassword = async(req, res) => {
     const userPassword = await userService.updateUserPassword(req, res, cleanBody, userId)
 }
 
-const updateUser = async() => {
+const updateUser = async(req, res) => {
+    let id = req.params.id;
+    // _.pick grabs and object and return the same object with keys you defined into arrays as second parameter
+    let CleanBody = _.pick(req.body, ['name', 'email', 'img', 'rol', 'state']);
 
+    const userUpd = await userService.updateUser(req, res, CleanBody, id);
 }
 
 const hardDeleteUser = async() => {

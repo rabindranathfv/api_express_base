@@ -21,30 +21,7 @@ app.post('/users', userCtrl.postCreateUser);
 app.put('/users/password', userCtrl.updateUserPassword);
 
 /* [checkToken, checkAdMinRole], */
-app.put('/users/:id', (req, res) => {
-    console.log(` Update user By ID Users `);
-    console.log(`Los params son `, req.params);
-    let id = req.params.id;
-    // _.pick grabs and object and return the same object with keys you defined into arrays as second parameter
-    let body = _.pick(req.body, ['name', 'email', 'img', 'rol', 'state']);
-    console.log('***** BODY From request ***********', body);
-    // add context: query for update email into this validation
-    UserModel.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                message: `problem with users updated by Id`,
-                err
-            });
-        }
-        res.json({
-            ok: true,
-            message: 'Update user sucessfully',
-            user: userDB
-        });
-    });
-
-});
+app.put('/users/:id', userCtrl.updateUser);
 
 /* hard delete */
 /* [checkToken, checkAdMinRole], */

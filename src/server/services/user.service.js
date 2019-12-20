@@ -101,8 +101,21 @@ const updateUserPassword = async(req, res, cleanBody, userId) => {
     });
 }
 
-const updateUser = async() => {
-
+const updateUser = async(req, res, objUser, id) => {
+    UserModel.findByIdAndUpdate(id, objUser, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                message: `problem with users updated by Id`,
+                err
+            });
+        }
+        res.json({
+            ok: true,
+            message: 'Update user sucessfully',
+            user: userDB
+        });
+    });
 }
 
 const hardDeleteUser = async() => {
