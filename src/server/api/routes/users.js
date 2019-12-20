@@ -56,7 +56,8 @@ app.delete('/users/:id', (req, res) => {
 
 /* soft delete */
 /* checkToken */
-app.delete('/users/2/:id', (req, res) => {
+app.delete('/users/2/:id', userCtrl.softDeleteUser);
+/* app.delete('/users/2/:id', (req, res) => {
     console.log(` delete User - soft delete `);
     let idUser = req.params.id;
     req.body.state = false;
@@ -85,6 +86,6 @@ app.delete('/users/2/:id', (req, res) => {
             user: userDelete
         });
     });
-});
+}); */
 
 module.exports = app;
