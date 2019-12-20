@@ -19,7 +19,7 @@ const getUserById = async(req, res) => {
 
 }
 
-const createUser = async(objUser) => {
+const createUser = async(objUser, req, res) => {
     try {
         debug('Create User');
         let user = new UserModel({
@@ -28,9 +28,23 @@ const createUser = async(objUser) => {
             password: utils.hashPassword(objUser.password, saltRounds),
             rol: objUser.rol
         });
-        return user.save();
+        return user.save((err, userDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    message: `problems with users creation, db troubles`,
+                    err
+                });
+            }
+            res.json({
+                ok: true,
+                message: 'create users sucessfully',
+                user: userDB
+            });
+        });
     } catch (e) {
-        // console.log('Error en el servicio', e);
+        debug('Create User Error');
+        console.log('Error en el servicio', e);
     }
 }
 

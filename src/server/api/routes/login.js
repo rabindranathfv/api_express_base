@@ -3,9 +3,10 @@ const UserModel = require('../../models/users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const _ = require('underscore');
+const authenticationCtrl = require('../../controllers/authentication.ctrl');
 
 const app = express();
-
+/* 
 app.post('/login', (req, res) => {
 
     let body = req.body;
@@ -46,5 +47,7 @@ app.post('/login', (req, res) => {
         });
     });
 });
+ */
+app.post('/login', authenticationCtrl.postLogin);
 
 module.exports = app;
