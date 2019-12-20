@@ -49,12 +49,17 @@ const updateUser = async(req, res) => {
     const userUpd = await userService.updateUser(req, res, CleanBody, id);
 }
 
-const hardDeleteUser = async() => {
+const hardDeleteUser = async(req, res) => {
 
 }
 
-const softDeleteUser = async() => {
+const softDeleteUser = async(req, res) => {
+    console.log(` delete User - soft delete `);
+    let idUser = req.params.id;
+    req.body.state = false;
+    let body = _.pick(req.body, ['state']);
 
+    const userDel = await userService.softDeleteUser(req, res, body, idUser);
 }
 
 module.exports = {

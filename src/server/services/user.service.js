@@ -101,8 +101,8 @@ const updateUserPassword = async(req, res, cleanBody, userId) => {
     });
 }
 
-const updateUser = async(req, res, objUser, id) => {
-    UserModel.findByIdAndUpdate(id, objUser, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
+const updateUser = async(req, res, objUser, UserId) => {
+    UserModel.findByIdAndUpdate(UserId, objUser, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -122,8 +122,30 @@ const hardDeleteUser = async() => {
 
 }
 
-const softDeleteUser = async() => {
+const softDeleteUser = async(req, res, objUser, userId) => {
+    UserModel.findByIdAndUpdate(userId, objUser, { new: true, runValidators: true, context: 'query' }, (err, userDelete) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                message: `problems with users soft delete`,
+                err
+            });
+        }
 
+        if (!userDelete) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'User does not exist'
+                }
+            });
+        }
+        res.json({
+            ok: true,
+            message: 'Update user sucessfully',
+            user: userDelete
+        });
+    });
 }
 
 module.exports = {
