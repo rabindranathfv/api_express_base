@@ -8,42 +8,8 @@ const saltRounds = 10;
 
 const app = express();
 
-app.get('/users', userCtrl.getUsers);
-
 /* checkToken */
-app.get('/users', (req, res) => {
-
-    // route /users?limit=<value>&start=<value>
-    console.log(` get All Users `);
-    console.log(` QueryParams `, req.query);
-    let start = req.query.start || 0;
-    start = Number(start);
-    let limit = req.query.limit || 15;
-    limit = Number(limit);
-
-    // the find condition and count condition must be the same for count in the right way
-    UserModel.find({ state: true }, 'name email rol')
-        .skip(start)
-        .limit(limit)
-        .exec((err, usersLists) => {
-            if (err) {
-                return res.status(400).json({
-                    ok: false,
-                    message: `not users exist`,
-                    err
-                });
-            }
-            UserModel.countDocuments({ state: true }, (err, numUsers) => {
-                res.json({
-                    ok: true,
-                    message: 'get list of users successfully',
-                    amountUsers: numUsers,
-                    user: usersLists
-                });
-            });
-        });
-
-});
+app.get('/users', userCtrl.getUsers);
 
 /* checkToken, */
 app.get('/users/:id', (req, res) => {
@@ -69,7 +35,6 @@ app.get('/users/:id', (req, res) => {
 });
 /* [checkToken, checkAdMinRole] */
 app.post('/users', userCtrl.postCreateUser);
-
 
 /* checkToken */
 app.put('/users/password', (req, res) => {

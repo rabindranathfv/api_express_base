@@ -11,15 +11,50 @@ const utils = require('../utils/utils');
 const debug = new Debug('backend:service:user');
 const saltRounds = 10;
 
-const getUsers = async(req, res) => {
+const getUsers = async(req, res, start, limit) => {
 
+    // the find condition and count condition must be the same for count in the right way
+    UserModel.find({ state: true }, 'name email rol')
+        .skip(start)
+        .limit(limit)
+        .exec((err, usersLists) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    message: `not users exist`,
+                    err
+                });
+            }
+            UserModel.countDocuments({ state: true }, (err, numUsers) => {
+                res.json({
+                    ok: true,
+                    message: 'get list of users successfully',
+                    amountUsers: numUsers,
+                    user: usersLists
+                });
+            });
+        });
 }
 
-const getUserById = async(req, res) => {
-
+const getUserById = async(req, res, ObjectUser, userId) => {
+    UserModel.findByIdAndUpdate(userId, body, { new: true, runValidators: true, useFindAndModify: 'false' })
+        .exec((err, userDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    message: `the user doesn't exist`,
+                    err
+                });
+            }
+            res.json({
+                ok: true,
+                message: `the user exist`,
+                user: userDB
+            });
+        });
 }
 
-const createUser = async(objUser, req, res) => {
+const createUser = async(req, res, objUser) => {
     try {
         debug('Create User');
         let user = new UserModel({
