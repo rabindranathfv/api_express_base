@@ -3,7 +3,8 @@
 const Debug = require('debug');
 const jwt = require('jsonwebtoken');
 const _ = require('underscore');
-
+const path = require('path');
+const nodeMailer = require('nodemailer');
 // models
 const UserModel = require('../models/users');
 
@@ -56,6 +57,37 @@ const login = async(objUser, req, res) => {
     }
 }
 
+const recoveryPassword = (objUser, req, res) => {
+    try {
+        debug('Recovery Password User');
+        UserModel.findOne({ email: objUser.email }, (err, userDB) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+            if (!userDB) {
+                return res.status(400).json({
+                    ok: false,
+                    err: {
+                        message: `no existe el email ${objUser.email}`
+                    }
+                });
+            }
+
+            res.json({
+                ok: true,
+                message: 'Recuperacion de contraseña exitosa',
+                user: userDB,
+            });
+        });
+    } catch (e) {
+
+    }
+}
+
 module.exports = {
-    login
+    login,
+    recoveryPassword
 }

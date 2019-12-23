@@ -14,6 +14,12 @@ const postLogin = async(req, res) => {
     const user = await authenticationService.login(userData, req, res);
 }
 
+const postRecoverPassword = async(req, res) => {
+    const userData = req.body;
+    const userRecover = await authenticationService.recoveryPassword(userData, req, res);
+}
+
 module.exports = {
-    postLogin
+    postLogin,
+    postRecoverPassword
 }
