@@ -1,6 +1,8 @@
 'use stric';
 const chalk = require('chalk');
 const bcrypt = require('bcrypt');
+const path = require('path');
+const nodeMailer = require('nodemailer');
 
 const hashPassword = (password, saltRounds) => {
     return bcrypt.hashSync(password, saltRounds)
@@ -15,6 +17,33 @@ const handleFatalError = (error) => {
     console.error(chalk `{red.bold [fatal error] ${error.message}❌ WTF O__O }`)
     console.error(error.stack)
     process.exit(1)
+}
+
+const sendSimpleEamil = (sendToEmail) => {
+    let transporter = nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: 'rabindranath.ferreira@forcast.cl',
+            pass: 'rabin123'
+        }
+    });
+    let mailOptions = {
+        from: 'soporte@forcast.cl', // sender address
+        to: sendToEmail, // list of receivers
+        subject: 'Recover Password', // Subject line
+        text: 'TEXT CONTENT', // plain text body
+        html: '<b>NodeJS Email Tutorial</b>' // html body
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        res.render('index');
+    });
 }
 
 /* Function to send a specific responses
