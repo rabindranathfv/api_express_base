@@ -14,16 +14,15 @@ Boilerplate based API Structure projects for nodeJs/Express. Include mongoDB
 3. [LazyLoad](#lazyload)
 4. [Views](#views)
 5. [Services](#services)
-6. [Componentes](#components)
-7. [Interfaces](#interfaces)
-8. [Directives](#directives)
-9. [Pipes](#pipes)
-10. [Internationalization - I18n](#i18n)
-11. [Enviroments for building process](#enviroments)
-12. [Style](#style)
-13. [Assets](#assets)
-14. [Interceptor](#interceptor)
-15. [Mock data](#mockdata)
+6. [Interfaces](#interfaces)
+7. [Directives](#directives)
+8. [Pipes](#pipes)
+9. [Internationalization - I18n](#i18n)
+10. [Enviroments for building process](#enviroments)
+11. [Style](#style)
+12. [Assets](#assets)
+13. [Interceptor](#interceptor)
+14. [Mock data](#mockdata)
 
 ## Project Structure
 <a name="projectstructure"/>
@@ -272,20 +271,6 @@ public getExemple( id: number, resource: string ): Observable<any> {
   }
 ```
 + checkout about behaviors from rxjs!
-
-## Components
-<a name="components"/>
-
-The most import for creation of componentes is:
-+ the always have some inputs,output or boths (depends on the solution).
-+ subscribe method direct from service.
-+ Apply javascript high order function for handle data (map, foreach, filter, reduce, rxjs operators, etc).
-+ the style of component always is using .scss combine angular material and clases define into style folder or into `style.sccs`.
-+ the name of the component must be descriptive and neutral.
-+ each component should be the most dynamic possible.
-+ Use flexbox, css grid and another stuff into .scss
-+ Avoid use inline css into html file
-+ the methods inside component must be verbose enought and easy to understand
 
 ## Interfaces
 <a name="interfaces"/>
