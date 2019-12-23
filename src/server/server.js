@@ -1,6 +1,7 @@
 require('./config/config');
 const express = require('express');
 const app = express();
+const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -17,6 +18,10 @@ app.use(require('./config/headers'));
 dotenv.config();
 const debug = new Debug('backend-api:root');
 app.use(require('./api/routes/indexRoutes'));
+
+app.set('view engine', 'ejs');
+console.log(' dir name node', __dirname + 'public');
+app.use(express.static(__dirname + 'public'));
 
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err, resp) => {
     if (err) console.log(err)
