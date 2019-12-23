@@ -1,34 +1,30 @@
 const express = require('express');
-const UserModel = require('../../models/users');
-const bcrypt = require('bcrypt');
-const _ = require('underscore');
 const userCtrl = require('../../controllers/user.ctrl');
-const { getUsers, getUserById, createUsers } = require('../../services/user.service');
-const saltRounds = 10;
+const { checkToken, checkAdMinRole } = require('../middleware/auth');
 
 const app = express();
 
 /* checkToken */
-app.get('/users', userCtrl.getUsers);
+app.get('/users', checkToken, userCtrl.getUsers);
 
 /* checkToken, */
-app.get('/users/:id', userCtrl.getUserById);
+app.get('/users/:id', checkToken, userCtrl.getUserById);
 
 /* [checkToken, checkAdMinRole] */
-app.post('/users', userCtrl.postCreateUser);
+app.post('/users', [checkToken, checkAdMinRole], userCtrl.postCreateUser);
 
 /* checkToken */
-app.put('/users/password', userCtrl.updateUserPassword);
+app.put('/users/password', checkToken, userCtrl.updateUserPassword);
 
 /* [checkToken, checkAdMinRole], */
-app.put('/users/:id', userCtrl.updateUser);
+app.put('/users/:id', [checkToken, checkAdMinRole], userCtrl.updateUser);
 
 /* hard delete */
 /* [checkToken, checkAdMinRole], */
-app.delete('/users/:id', userCtrl.hardDeleteUser);
+app.delete('/users/:id', [checkToken, checkAdMinRole], userCtrl.hardDeleteUser);
 
 /* soft delete */
 /* checkToken */
-app.delete('/users/2/:id', userCtrl.softDeleteUser);
+app.delete('/users/2/:id', checkToken, userCtrl.softDeleteUser);
 
 module.exports = app;
