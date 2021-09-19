@@ -35,7 +35,7 @@
         "jsonwebtoken": "^8.5.1",
         "mailgun-js": "^0.22.0",
         "moment": "^2.24.0",
-        "mongoose": "^5.7.3",
+        "mongoose": "^5.7.5",
         "mongoose-unique-validator": "^2.0.3",
         "nodemailer": "^6.6.3",
         "underscore": "^1.13.1"
