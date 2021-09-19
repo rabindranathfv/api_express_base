@@ -8,7 +8,9 @@
     "main": "app.js",
     "scripts": {
         "start": "nodemon server/server.js",
-        "test": "jest"
+        "test": "jest",
+        "eslint": "node_modules/.bin/eslint server --quiet",
+        "eslint-fix": "eslint server --fix"
     },
     "repository": {
         "type": "git",
@@ -41,13 +43,14 @@
         "underscore": "^1.13.1"
     },
     "devDependencies": {
+        "eslint": "^7.32.0",
         "husky": "^7.0.2",
         "jest": "^27.2.0",
         "nodemon": "^1.19.3"
     },
     "husky": {
         "hooks": {
-            "pre-commit": "npm run test",
+            "pre-commit": "npm run eslint &% npm run test",
             "pre-push": "npm run test"
         }
     }

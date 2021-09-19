@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 require('./config/config');
 const express = require('express');
 const app = express();
@@ -15,18 +16,18 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(require('./config/headers'));
 dotenv.config();
-const debug = new Debug('backend-api:root');
 app.use(require('./api/routes/indexRoutes'));
 
 app.set('view engine', 'ejs');
+// eslint-disable-next-line no-undef
 console.log(' dir name node', __dirname + 'public');
 app.use(express.static(__dirname + 'public'));
 
 mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err, resp) => {
-    if (err) console.log(err)
-    console.log('DB Connection sucessfully', process.env.URLDB);
+  if (err) console.log(err)
+  console.log('DB Connection sucessfully', process.env.URLDB);
 });
 
 app.listen(process.env.PORT, () => {
-    console.log(`Listen at port ${process.env.PORT}`);
+  console.log(`Listen at port ${process.env.PORT}`);
 });

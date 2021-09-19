@@ -9,15 +9,15 @@ let Schema = mongoose.Schema;
     with populate into queries responses for see that instance related into another instances
 */
 let categorySchema = new Schema({
-    description: {
-        type: String,
-        unique: true,
-        required: [true, 'description is required']
-    },
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    }
+  description: {
+    type: String,
+    unique: true,
+    required: [true, 'description is required']
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'user'
+  }
 });
 
 module.exports = mongoose.model('category', categorySchema);

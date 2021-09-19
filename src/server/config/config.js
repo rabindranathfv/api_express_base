@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // ############# PORT CONFIGURATION
 process.env.PORT = process.env.PORT || 3000;
 
@@ -21,9 +22,9 @@ let urlDB;
 let dbName = 'testDB'
 
 if (process.env.NODE_ENV === 'dev') {
-    urlDB = `mongodb://localhost:27017/${dbName}`;
+  urlDB = `mongodb://localhost:27017/${dbName}`;
 } else {
-    urlDB = process.env.MONGO_URI;
+  urlDB = process.env.MONGO_URI;
 }
 
 process.env.URLDB = urlDB;
