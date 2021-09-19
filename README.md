@@ -10,19 +10,11 @@ Boilerplate based API Structure projects for nodeJs/Express. Include mongoDB
 ### Information Important
 
 1. [Project structure](#projectstructure)
-2. [Routing](#routing)
-3. [LazyLoad](#lazyload)
-4. [Views](#views)
-5. [Services](#services)
-6. [Interfaces](#interfaces)
-7. [Directives](#directives)
-8. [Pipes](#pipes)
-9. [Internationalization - I18n](#i18n)
-10. [Enviroments for building process](#enviroments)
-11. [Style](#style)
-12. [Assets](#assets)
-13. [Interceptor](#interceptor)
-14. [Mock data](#mockdata)
+2. [Public](#public)
+3. [Server](#server)
+4. [Uploads](#upload)
+5. [Tests](#test)
+6. [Services](#services)
 
 ## Project Structure
 <a name="projectstructure"/>
@@ -32,478 +24,268 @@ The structure of this project defined by folders with specific purpose
 ```
 .
 ├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│         ├── pipes             # Pipe Module
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│         ├── services          # Service request for API or Severals APIs
-│         ├── view              # view defined into routing module
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json 
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss 
-│         ├── _mixins.scss      # mixing scss 
-│         ├── _variable.sccs    # global variables for styles     
-│   └── ...                     # etc.
-├── helpers                     # helpers scripts for back for front
-├── logs                        # logs for request in back for front
-├── redis                       # redis connection, models, etc
-├── socket                      # socket io implementation back for front
-├── www                         # build angular application
+├── src                                         
+│   ├── public                      # public files
+│   ├── server                  # main source code folder
+│        ├── api                  # api rest
+│        ├── assets               # assets
+│     ├── config                  # config files
+│     ├── controllers             # controlers
+│     ├── models                  # db models
+│     ├── services                # services
+│     ├── utils                   # utilies
+│   ├── Uploads                   # uploads files
 └──...
 ```
 
-## Routing
-<a name="routing"/>
-We normally use 2 lvls of routing, the firts one is at the same lvl of `app.module.ts`, this is our main routing and inside we delegate routing to views module using lazyload approach.
+## Public
+<a name="public"/>
+We store public files in this folder
+
+## Server
+<a name="server"/>
+
+We have all the logic from API REST main center in folder  `api` and `assets`. The api folder is divided by middelware folder `midleware` and `routes`.
+
+for routes we use a main file for index all routes in `indexRoutes.js` and use exports grabs the real route for that endpoint
 
 ```javascript
-const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
-    canActivate: [LogedGuard]
-  },
-  {
-    path: 'login',
-    component: LoginComponent,
-    /* canActivate: [LogedGuard] */
-  },
-  {
-    path: 'centro-control',
-    loadChildren: 'src/app/view/center-control/center-control.module#CenterControlModule',
-    data: { title: 'Centro de control', resource: 'control', type: 'control' },
-    /* canActivate: [LoginGuard] */
-  },
-  .
-  .
-  .
-  .
-  .
-  {
-    path: '**',
-    pathMatch: 'full',
-    redirectTo: 'login',
-  }
-];
+const express = require('express');
+
+const app = express();
+
+app.use(require('./users'));
+app.use(require('./login'));
+app.use(require('./category'));
+app.use(require('./product'));
+app.use(require('./upload'));
+app.use(require('./images'));
+
+module.exports = app;
 ```
-
-the most important about this is the way we make the lazyload and stuff we send into each view.
-```javascript
-{
-    path: 'opciones',
-    loadChildren: 'src/app/view/options/options.module#OptionsModule',
-    data: { title: 'Opciones', resource: 'options', type: 'options', url: 'base' },
-    /* canActivate: [LoginGuard] */
-}
-```
-
-+ **path** is full route of the view.
-+ **loadChildren** with full path, do not use relative.
-+ **data** title is basic the name of the view, resource and type are used for interaction inside components, templates and services operations and url is data for ` breadcrumb component ` (use this url for construct the route for final users).
-
-Inside each view existing in the application we define a secondary route handle for child rutes, just follow the path define in loadChildren parameter. Remenber check `_nav.ts` because is related to this file.
-
-## LazyLoad
-<a name="lazyload"/>
-
-We use 2 lvls of routing, for this example we are going to use `centro-control`view 
+an example of /users endpoints. in this file we use middelwares and call controlers file and make validations if we need it
 
 ```javascript
-const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
-    canActivate: [LogedGuard]
-  },
-  {
-    path: 'login',
-    component: LoginComponent,
-    /* canActivate: [LogedGuard] */
-  },
-  {
-    path: 'centro-control',
-    loadChildren: 'src/app/view/center-control/center-control.module#CenterControlModule',
-    data: { title: 'Centro de control', resource: 'control', type: 'control' },
-    /* canActivate: [LoginGuard] */
-  },
-  .
-  .
-  .
-  .
-  .
-  {
-    path: '**',
-    pathMatch: 'full',
-    redirectTo: 'login',
-  }
-];
-```
-now we need to go inside view folder with `center-control` with this structure
+const express = require('express');
+const userCtrl = require('../../controllers/user.ctrl');
+const { checkToken, checkAdMinRole } = require('../middleware/auth');
 
-```javascript
-├── view                                    
-│  ├── center-control               # view folder with route 'centro-control'
-│     ├── center-control             
-│         ├── html                  # html file of specific component 
-│         ├── spec                  # spec file of specific component
-│         ├── scss                  # scss file of specific component
-│         ├── ts                    # ts file of specific component
-│      ├── center-control-details   # Main files of ang app
-│         ├── html                  # html file of specific component 
-│         ├── spec                  # spec file of specific component
-│         ├── scss                  # scss file of specific component
-│         ├── ts                    # ts file of specific component
-├── routing.module.ts               # here we handle the lazyload and all routes of this view
-├── .module.ts                       # the module for import routing, components or another modules we are going to use
-│   └── ...                         # etc.
-└──...
+const app = express();
+
+app.get('/users', checkToken, userCtrl.getUsers);
+
+app.get('/users/:id', checkToken, userCtrl.getUserById);
+
+app.post('/users', [checkToken, checkAdMinRole], userCtrl.postCreateUser);
+
+app.put('/users/password', checkToken, userCtrl.updateUserPassword);
+
+app.put('/users/:id', [checkToken, checkAdMinRole], userCtrl.updateUser);
+
+app.delete('/users/:id', [checkToken, checkAdMinRole], userCtrl.hardDeleteUser);
+
+app.delete('/users/2/:id', checkToken, userCtrl.softDeleteUser);
+
+module.exports = app;
 ```
 
-the sctruture of routing inside is
+## upload
+<a name="upload"/>
 
-```javascript
-const routes: Routes = [
-  {
-    path: '',
-    component: CenterControlComponent
-  },
-  {
-    path: ':id/detalles',
-    component: CenterControlDetailsComponent
-  }
-];
+this exist into `upload` folder, we are going to save here all files the user upload into our API
 
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class CenterControlRoutingModule { }
-```
-+ base path is always is empty
-+ the rest of the routes use the base route in main `app-routing.module.ts` with new routes inside child
+## test
+<a name="test"/>
 
-## Views
-<a name="views"/>
-
-All views must be add inside a view folder
-
-```javascript
-.
-├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│         ├── pipes             # Pipe Module
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│         ├── services          # Service request for API or Severals APIs
-│         ├── view              # view defined into routing module
-│           ├── viewFolder1  
-│           ├── viewFolder2  
-│           ├── viewFolder3  
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json 
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss     
-│   └── ...                     # etc.
-└──...
-```
-inside always you are going to have name of the view with routing.module.ts and <nameView>.module.ts with severals folders inside for all the views related with this base path.
+we apply this practice of all our files into our API, using jest as library.
 
 ## Services
 <a name="services"/>
 
-The most important here is make the request to API without apply map or another methods based in js
+The most important here is make the login in our API.
 
 ```javascript
-.
-├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│         ├── pipes             # Pipe Module
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│         ├── services          # Service request for API or Severals APIs
-│           ├── serviceFolder   # view defined into routing module
-│             ├── <name>.service.ts
-│             ├── <name>.service.spec.ts
-│         ├── view              # view defined into routing module
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json 
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss     
-│   └── ...                     # etc.
-└──...
-```
-Use observables! we don't apply map or another high order functions inside the service, we manipulate data inside view, components, etc
+'use strict';
 
-```javascript
-public getExemple( id: number, resource: string ): Observable<any> {
-    return this.http.get(`${environment.url}/${resource}/${id}`)
-               .pipe(catchError(this.handleError));
+const Debug = require('debug');
+const _ = require('underscore');
+
+// models
+const UserModel = require('../models/users');
+
+// utils
+const utils = require('../utils/utils');
+
+const debug = new Debug('backend:service:user');
+const saltRounds = 10;
+
+const getUsers = async(req, res, start, limit) => {
+
+  // the find condition and count condition must be the same for count in the right way
+  UserModel.find({ state: true }, 'name email rol')
+    .skip(start)
+    .limit(limit)
+    .exec((err, usersLists) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          message: `not users exist`,
+          err
+        });
+      }
+      UserModel.countDocuments({ state: true }, (err, numUsers) => {
+        res.json({
+          ok: true,
+          message: 'get list of users successfully',
+          amountUsers: numUsers,
+          user: usersLists
+        });
+      });
+    });
+}
+
+const getUserById = async(req, res, ObjectUser, userId) => {
+  UserModel.findByIdAndUpdate(userId, ObjectUser, { new: true, runValidators: true, useFindAndModify: 'false' })
+    .exec((err, userDB) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          message: `the user doesn't exist`,
+          err
+        });
+      }
+      res.json({
+        ok: true,
+        message: `the user exist`,
+        user: userDB
+      });
+    });
+}
+
+const createUser = async(req, res, objUser) => {
+  try {
+    debug('Create User');
+    let user = new UserModel({
+      name: objUser.name,
+      email: objUser.email,
+      password: utils.hashPassword(objUser.password, saltRounds),
+      rol: objUser.rol
+    });
+    return user.save((err, userDB) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          message: `problems with users creation, db troubles`,
+          err
+        });
+      }
+      res.json({
+        ok: true,
+        message: 'create users sucessfully',
+        user: userDB
+      });
+    });
+  } catch (e) {
+    debug('Create User Error');
+    console.log('Error en el servicio', e);
   }
-```
-+ checkout about behaviors from rxjs!
-
-## Interfaces
-<a name="interfaces"/>
-
-We define interfaces for more control into application and we always create a folder for each interface use the `export` statement. if this folder doesn't exist create one
-
-```javascript
-.
-├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│         ├── pipes             # Pipe Module
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│           ├── <name>   
-│             ├── <name>.interface.ts
-│         ├── services          # Service request for API or Severals APIs
-│         ├── view              # view defined into routing module
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json 
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss     
-│   └── ...                     # etc.
-└──...
-```
-
-one example of interface is: 
-
-```javascript
-export interface Validator {
-    name: string;
-    validator: any;
-    message: string;
 }
 
-export interface FieldConfig {
-    label?: string;
-    name?: string;
-    inputType?: string;
-    minlength?: number;
-    required?: boolean;
-    disabled?: boolean;
-    typeAttribute?: string;
-    options?: string[];
-    collections?: any;
-    type: string;
-    value?: any;
-    validations?: Validator[];
+const updateUserPassword = async(req, res, cleanBody, userId) => {
+
+  UserModel.findByIdAndUpdate(userId, cleanBody, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        message: `problem with users updated by Id`,
+        err
+      });
+    }
+    res.json({
+      ok: true,
+      message: 'Update user password sucessfully',
+    });
+  });
 }
-```
 
-## Directives
-<a name="directives"/>
+const updateUser = async(req, res, objUser, UserId) => {
+  UserModel.findByIdAndUpdate(UserId, objUser, { new: true, runValidators: true, context: 'query', useFindAndModify: 'false' }, (err, userDB) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        message: `problem with users updated by Id`,
+        err
+      });
+    }
+    res.json({
+      ok: true,
+      message: 'Update user sucessfully',
+      user: userDB
+    });
+  });
+}
 
-We define a `directives.module.ts` for import all directives and reuse in any place. if this folder doesn't exist create one
+const hardDeleteUser = async(req, res, userId) => {
+  UserModel.findByIdAndRemove(userId, (err, userDelete) => {
+    console.log('*** User ****', userDelete);
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        message: `problems with users hard delete`,
+        err
+      });
+    }
+    if (!userDelete) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          message: 'User does not exist'
+        }
+      });
+    }
+    res.json({
+      ok: true,
+      message: 'user delete sucessfully',
+      user: userDelete
+    });
+  });
+}
 
-```javascript
-.
-├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│           ├── <name>   
-│             ├── <name>.directive.ts
-│         ├── pipes             # Pipe Module
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│         ├── services          # Service request for API or Severals APIs
-│         ├── view              # view defined into routing module
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json 
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss     
-│   └── ...                     # etc.
-└──...
-```
+const softDeleteUser = async(req, res, objUser, userId) => {
+  UserModel.findByIdAndUpdate(userId, objUser, { new: true, runValidators: true, context: 'query' }, (err, userDelete) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        message: `problems with users soft delete`,
+        err
+      });
+    }
 
-## Pipes
-<a name="pipes"/>
+    if (!userDelete) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          message: 'User does not exist'
+        }
+      });
+    }
+    res.json({
+      ok: true,
+      message: 'Update user sucessfully',
+      user: userDelete
+    });
+  });
+}
 
-We define a `pipes.module.ts` for import all directives and reuse in any place. if this folder doesn't exist create one
-
-```javascript
-.
-├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│         ├── pipes             # Pipe Module
-│           ├── <name>   
-│             ├── <name>.pipe.ts
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│         ├── services          # Service request for API or Severals APIs
-│         ├── view              # view defined into routing module
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json 
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss     
-│   └── ...                     # etc.
-└──...
-```
-
-## Internazionalization - I18n
-<a name="i18n"/>
-
-```javascript
-.
-├── ...
-├── api                     
-├── auth                    
-├── client                      # angular application
-│   ├── e2e                     # e2e test
-│   ├── src                     # Main files of ang app
-│      ├── app                  
-│         ├── components        # all components with their own module for easy import 
-│         ├── directives        # Directives Module
-│         ├── pipes             # Pipe Module
-│         ├── guard             # guards for User roles access
-│         ├── interceptor       # interceptor for handle request
-│         ├── interfaces        # all interfaces define by part you need, models 
-│         ├── services          # Service request for API or Severals APIs
-│         ├── view              # view defined into routing module
-│         ├── _mock-datas.ts    # all definitions of data mock is here
-│         ├── _nav.ts           # definition for sidebar navigation
-│      ├── assets               # Assets include imgs, css, icons, img and most import i18n en.json, es.json
-│           ├── i18n   
-│             ├── es.json       # support all spanish texts, labels, etc
-│             ├── en.json       # support all english texts, labels, etc
-│      └── ...                     # etc.
-│      ├── enviroments          # settings for dev, stagging and productions for API
-│      ├── style                # FILES .scss     
-│   └── ...                     # etc.
-└──...
-```
-
-if you add a new view into module you must add the requirements for use internationalization with [ngx-traslate](https://github.com/ngx-translate/core)
-
-Remenber imports necessary stuff, and add this into imports array in this way:
-```
-TranslateModule.forChild({
-        loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-    },
-      isolate: false
-  }),
-```
-
-and at this one at the end of the module, after export class statement
-
-```
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http);
+module.exports = {
+  createUser,
+  getUserById,
+  getUsers,
+  updateUserPassword,
+  updateUser,
+  hardDeleteUser,
+  softDeleteUser
 }
 ```
 
-## Enviroments
-<a name="enviroments"/>
-
-We define 3 files for this: production, staging and Dev
-
- Production for build you are going to use this file `./build.sh`
-
-```javascript
-export const environment = {
-  production: true,
-  url: 'http://x.x.x.x:5000/api/',
-  token: '123',
-};
-```
-
-Production for build you are going to use this file `./build_staging.sh`
-
-```javascript
-export const environment = {
-    production: true,
-    environmentName: 'staging',
-    url: 'http://x.x.x.x:5000/api/',
-    token: '123',
-};
-```
-
-
-## Style
-<a name="style"/>
-
-+ Define clear css, scss or sass implementation.
-+ create verbose clases, ids, selectors.
-+ Remenber use flexbox, css grid, or both.
-+ avoid to use position:  absolute property (just necesary cases).
-+ remenber use mixin based on flexbox, and if u need create new one go head.
-+ text better setup usin em units.
-+ use viewport units for layaouts (vw, vh, vhmax, vwmax).
-+ use colors just in hexadecimal representation
-+ check flexlayout implementation used into main content on our application. [Documentation](https://github.com/angular/flex-layout)
-
-## Assets
-<a name="assets"/>
-
-Inside this folder exist imgs, icons, js and another files
-+ Try to use png, or svg insted jpg or another format
-+ use dynamic routes for apply or use all assets
-
-## Interceptor
-<a name="interceptor"/>
-
-This is triggered just for all request and is combinend with loading component. check it, if you need get more deep
-
-## mock data
-<a name="mockdata"/>
-
-this exist into `_mock-datas.ts`, if you need use or check some formats this is the file!!
++ checkout good practices
