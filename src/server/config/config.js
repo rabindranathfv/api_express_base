@@ -18,9 +18,10 @@ process.env.SEED = process.env.SEED || 'token-seed-prod';
 // ###########  BD Config
 
 let urlDB;
+let dbName = 'testDB'
 
 if (process.env.NODE_ENV === 'dev') {
-    urlDB = 'mongodb://localhost:27017/innovaDB';
+    urlDB = `mongodb://localhost:27017/${dbName}`;
 } else {
     urlDB = process.env.MONGO_URI;
 }
