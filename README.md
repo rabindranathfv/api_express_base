@@ -4,8 +4,7 @@ Boilerplate based API Structure projects for nodeJs/Express. Include mongoDB
 
 + always use camelCase
 + ES6, ES7 Javascript standards
-+ check [angular style](https://angular.io/guide/styleguide) guide if you want more details
-+ all code must be in english!
++ remenber DRY, SOLID and Clean Code Rules
 
 ### Information Important
 
